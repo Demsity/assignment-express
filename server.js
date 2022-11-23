@@ -1,4 +1,13 @@
+const port = process.env.PORT || 4000
 const express = require('express')
+const cors = require('cors')
 const app = express()
 
-app.listen(4000)
+
+//  Middleware
+app.use(cors())
+
+const productController = require('./controllers/productController')
+app.use('/api/products', productController)
+
+app.listen(port)
