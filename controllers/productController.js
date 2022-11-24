@@ -12,7 +12,7 @@ controller.param("id", (req, res, next, articleNumber) => {
 
 controller.post('/', (req, res) => {
     let item = {
-        articleNumber: (products[products.length -1])?.id > 0 ? (products[products.length -1])?.id +1 : 1,
+        articleNumber: (products[products.length -1])?.articleNumber > 0 ? (products[products.length -1])?.articleNumber +1 : 1,
         name: req.body.name, 
         price: req.body.price, 
         rating: req.body.rating,
@@ -22,6 +22,7 @@ controller.post('/', (req, res) => {
     }
 
     products.push(item)
+    console.log(item)
     res.status(201).json(item)
 })
 

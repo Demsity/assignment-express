@@ -22,5 +22,5 @@ const comments = [
     },
 ]
 
-console.log(comments)
+
 module.exports = comments
