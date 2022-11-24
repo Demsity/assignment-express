@@ -1,6 +1,6 @@
 const express = require('express')
 const controller = express.Router()
-let products = require('../data/simulated_database')
+let products = require('../data/simulated_database_products')
 
 module.exports = controller
 
