@@ -37,6 +37,26 @@ controller.get('/:id', (req, res) => {
     }
 })
 
+controller.put('/:id', (req, res) => {
+
+    if (req != undefined){
+        console.log(req.body.updatedProduct.articleNumber)
+        products.forEach(product => {
+            // console.log(product)
+            if (product.articleNumber == req.body.updatedProduct.articleNumber) {
+                product.name = req.body.updatedProduct.name ? req.body.updatedProduct.name : product.name
+                product.description = req.body.updatedProduct.description ? req.body.updatedProduct.description : product.description
+                product.category = req.body.updatedProduct.category ? req.body.updatedProduct.category : product.category
+                product.imageName = req.body.updatedProduct.imageName ? req.body.updatedProduct.imageName : product.imageName
+                product.price = req.body.updatedProduct.price ? req.body.updatedProduct.price : product.price
+                product.rating = req.body.updatedProduct.rating ? req.body.updatedProduct.rating : product.rating
+            }
+        })                 
+        res.status(200).json()
+    }else
+        res.status(406).json()
+})
+
 
 // Get x Number or All
 controller.get(`/`, (req, res) => {
