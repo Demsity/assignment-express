@@ -37,12 +37,11 @@ controller.get('/:id', (req, res) => {
     }
 })
 
+// update a product
 controller.put('/:id', (req, res) => {
 
     if (req != undefined){
-        console.log(req.body.updatedProduct.articleNumber)
         products.forEach(product => {
-            // console.log(product)
             if (product.articleNumber == req.body.updatedProduct.articleNumber) {
                 product.name = req.body.updatedProduct.name ? req.body.updatedProduct.name : product.name
                 product.description = req.body.updatedProduct.description ? req.body.updatedProduct.description : product.description
@@ -68,7 +67,16 @@ controller.get(`/`, (req, res) => {
     }
 }) 
 
+//Delete a product
+controller.delete('/:id', (req, res) => {
+    if(req.body.updatedProduct != undefined) {
+        products = products.filter(product => product.articleNumber !== req.body.updatedProduct.articleNumber)
+        res.status(204).json(req.body.updatedProduct.articleNumber)
+    } else {
+        res.status(404).send()
+    }
 
+})
 
 
 
