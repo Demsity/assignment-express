@@ -4,8 +4,16 @@ let products = require('../data/simulated_database_products')
 
 module.exports = controller
 
-controller.param("id", (req, res, next, articleNumber) => {
-    req.product = products.find(product => product.articleNumber == articleNumber)
+controller.param("id", (req, res, next, id) => {
+    req.product = products.find(product => product.articleNumber == id)
+    next()
+})
+controller.param("tag", (req, res, next, tag) => {
+    req.tag = products.filter(product => product.tag === tag)
+    next()
+})
+controller.param("price", (req, res, next, price) => {
+    req.price = products.filter(product => product.price === parseInt(price))
     next()
 })
 
@@ -29,13 +37,42 @@ controller.post('/', (req, res) => {
 
 // Get a single product
 controller.get('/:id', (req, res) => {
-
     if (req != undefined){
         res.status(200).json(req.product)
     }else {
         res.status(404).json()
     }
 })
+
+// Get products/product by tag
+controller.get(`/get/:tag`, (req, res) => {
+    let take = req.query.take
+    if (req != undefined) {
+        if (req.query.take !== undefined){
+            res.status(200).json(req.tag.slice(0, take))
+        }else  {
+            res.status(200).json(req.tag)
+        }
+    } else {
+        res.status(404).json()
+    }
+
+}) 
+// Get products/product by price
+controller.get(`/price/:price`, (req, res) => {
+    let take = req.query.take
+    console.log(req.price)
+    if (req != undefined) {
+        if (req.query.take !== undefined){
+            res.status(200).json(req.price.slice(0, take))
+        }else  {
+            res.status(200).json(req.price)
+        }
+    } else {
+        res.status(404).json()
+    }
+
+}) 
 
 // update a product
 controller.put('/:id', (req, res) => {
