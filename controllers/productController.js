@@ -26,12 +26,12 @@ controller.post('/', (req, res) => {
         rating: req.body.rating,
         description: req.body.description, 
         category: req.body.category,
-        imageName: req.body.imageName
+        imageName: req.body.imageName,
+        tag: req.body.tag
     }
 
     products.push(item)
-    console.log(item)
-    res.status(201).json(item)
+    res.status(201).json(item.articleNumber)
 })
 
 
@@ -61,7 +61,6 @@ controller.get(`/get/:tag`, (req, res) => {
 // Get products/product by price
 controller.get(`/price/:price`, (req, res) => {
     let take = req.query.take
-    console.log(req.price)
     if (req != undefined) {
         if (req.query.take !== undefined){
             res.status(200).json(req.price.slice(0, take))

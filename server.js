@@ -9,11 +9,17 @@ const app = express()
 app.use(cors())
 app.use(bodeParser.json())
 
+
 const formController = require('./controllers/formController')
 app.use('/api', formController)
 
+const userController = require('./controllers/userController')
+app.use('/api/users', userController)
+
 const productController = require('./controllers/productController')
 app.use('/api/products', productController)
+
+
 
 
 
