@@ -1,115 +1,203 @@
 const express = require('express')
+const { default: mongoose } = require('mongoose')
 const controller = express.Router()
-let products = require('../data/simulated_database_products')
+const productSchema = require('../schemas/productSchema')
 
-module.exports = controller
-
-controller.param("id", (req, res, next, id) => {
-    req.product = products.find(product => product.articleNumber == id)
-    next()
-})
-controller.param("tag", (req, res, next, tag) => {
-    req.tag = products.filter(product => product.tag === tag)
-    next()
-})
-controller.param("price", (req, res, next, price) => {
-    req.price = products.filter(product => product.price === parseInt(price))
-    next()
-})
+//middleware
 
 
-controller.post('/', (req, res) => {
-    let item = {
-        articleNumber: (products[products.length -1])?.articleNumber > 0 ? (products[products.length -1])?.articleNumber +1 : 1,
-        name: req.body.name, 
-        price: req.body.price, 
-        rating: req.body.rating,
-        description: req.body.description, 
-        category: req.body.category,
-        imageName: req.body.imageName,
-        tag: req.body.tag
-    }
-
-    products.push(item)
-    res.status(201).json(item.articleNumber)
-})
-
+// unsecured routes ///////////////////////////////////////////////////////
 
 // Get a single product
-controller.get('/:id', (req, res) => {
-    if (req != undefined){
-        res.status(200).json(req.product)
-    }else {
-        res.status(404).json()
-    }
+controller.get('/:id', async (req, res) => {
+        const item = await productSchema.findById(req.params.id)
+        if (item) {
+                const product = {
+                    articleNumber: item._id.toString(),
+                    name: item.name,
+                    description: item.description,
+                    price: item.price,
+                    rating: item.rating,
+                    tag: item.tag,
+                    category: item.category,
+                    imageName: item.imageName
+                }
+
+                res.status(200).json(product) 
+
+        } else {
+            res.status(404)
+        }
+
 })
 
-// Get products/product by tag
-controller.get(`/get/:tag`, (req, res) => {
+// Get x Number or All
+controller.get(`/`, async (req, res) => {
     let take = req.query.take
-    if (req != undefined) {
-        if (req.query.take !== undefined){
-            res.status(200).json(req.tag.slice(0, take))
-        }else  {
-            res.status(200).json(req.tag)
+    try {
+        const listFromDB = await productSchema.find()
+        const products = []
+        if (listFromDB) {
+            for(let product of listFromDB) {
+                products.push({
+                    articleNumber: product._id,
+                    name: product.name,
+                    description: product.description,
+                    price: product.price,
+                    rating: product.rating,
+                    tag: product.tag,
+                    category: product.category,
+                    imageName: product.imageName
+                })
+            }
+            if (req.query.take !== undefined){
+                res.status(200).json(products.slice(0, take))
+            }else {
+                res.status(200).json(products)
+            }
+        } else {
+            res.status(404)
         }
-    } else {
-        res.status(404).json()
+
+    } catch {
+        res.status(400).json()
     }
+
+}) 
+
+// Get products/product by tag
+controller.get(`/get/:tag`, async (req, res) => {
+    let take = req.query.take
+
+    try {
+        const listFromDB = await productSchema.find({tag: req.params.tag})
+        const products = []
+        if (listFromDB) {
+            for(let product of listFromDB) {
+                products.push({
+                    articleNumber: product._id,
+                    name: product.name,
+                    description: product.description,
+                    price: product.price,
+                    rating: product.rating,
+                    tag: product.tag,
+                    category: product.category,
+                    imageName: product.imageName
+                })
+            }
+            if (req.query.take !== undefined){
+                res.status(200).json(products.slice(0, take))
+            }else {
+                res.status(200).json(products)
+            }
+        } else {
+            res.status(404)
+        }
+    } catch {
+        res.status(400).json()
+    }
+
 
 }) 
 // Get products/product by price
-controller.get(`/price/:price`, (req, res) => {
+controller.get(`/price/:price`, async (req, res) => {
     let take = req.query.take
-    if (req != undefined) {
-        if (req.query.take !== undefined){
-            res.status(200).json(req.price.slice(0, take))
-        }else  {
-            res.status(200).json(req.price)
+    try {
+        const listFromDB = await productSchema.find({price: req.params.price})
+        const products = []
+        if (listFromDB) {
+            for(let product of listFromDB) {
+                products.push({
+                    articleNumber: product._id,
+                    name: product.name,
+                    description: product.description,
+                    price: product.price,
+                    rating: product.rating,
+                    tag: product.tag,
+                    category: product.category,
+                    imageName: product.imageName
+                })
+            }
+            if (req.query.take !== undefined){
+                res.status(200).json(products.slice(0, take))
+            }else {
+                res.status(200).json(products)
+            }
+        } else {
+            res.status(404)
         }
-    } else {
-        res.status(404).json()
+    } catch {
+        res.status(400).json()
     }
 
+
 }) 
+
+
+// secured routes //////////////////////////////////////////////////////////////////
+
+// Create Product
+controller.post('/', async (req, res) => {
+        const {name, price, description, rating, tag, imageName, category} = req.body
+        
+
+        if (!name || !price) {
+            res.status(400).json()
+        } 
+        const itemConflict = await productSchema.findOne({name: name})
+        if (itemConflict) {
+            res.status(409).json()
+
+        } else {
+            const product = await productSchema.create({
+                name, 
+                description, 
+                price,
+                category,
+                tag,
+                imageName,
+                rating
+            })
+            if (product) {
+                res.status(201).json()
+            }else {
+                res.status(400).json()
+            }
+        }
+})
 
 // update a product
-controller.put('/:id', (req, res) => {
+controller.put('/:id', async (req, res) => {
 
-    if (req != undefined){
-        products.forEach(product => {
-            if (product.articleNumber == req.body.updatedProduct.articleNumber) {
-                product.name = req.body.updatedProduct.name ? req.body.updatedProduct.name : product.name
-                product.description = req.body.updatedProduct.description ? req.body.updatedProduct.description : product.description
-                product.category = req.body.updatedProduct.category ? req.body.updatedProduct.category : product.category
-                product.imageName = req.body.updatedProduct.imageName ? req.body.updatedProduct.imageName : product.imageName
-                product.price = req.body.updatedProduct.price ? req.body.updatedProduct.price : product.price
-                product.rating = req.body.updatedProduct.rating ? req.body.updatedProduct.rating : product.rating
-            }
-        })                 
-        res.status(200).json()
-    }else
-        res.status(406).json()
+    const {name, price, description, rating, tag, imageName, category} = req.body
+    
+        try {
+            const filter = req.body.articleNumber
+            console.log(filter)
+            await productSchema.findByIdAndUpdate({_id: filter}, {
+                name: name,
+                description: description, 
+                price: price,
+                category: category,
+                tag: tag,
+                imageName: imageName,
+                rating: rating
+            },{new: true})
+            res.status(200)
+        } catch {
+            res.status(400)
+        }
+
+
 })
-
-
-// Get x Number or All
-controller.get(`/`, (req, res) => {
-    let take = req.query.take
-    if (req.query.take !== undefined){
-        res.status(200).json(products.slice(0, take))
-    }else {
-        res.status(200).json(products)
-    }
-}) 
 
 //Delete a product
-controller.delete('/:id', (req, res) => {
-    if(req.body.updatedProduct != undefined) {
-        products = products.filter(product => product.articleNumber !== req.body.updatedProduct.articleNumber)
-        res.status(204).json(req.body.updatedProduct.articleNumber)
-    } else {
-        res.status(404).send()
+controller.delete('/:id', async (req, res) => {
+    try {
+        await productSchema.findByIdAndDelete(req.params.id)
+        res.status(200)
+    }catch {
+        res.status(404)
     }
 
 })
@@ -117,4 +205,4 @@ controller.delete('/:id', (req, res) => {
 
 
 
-
+module.exports = controller
