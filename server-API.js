@@ -14,7 +14,7 @@ app.use(bodeParser.json())
 
 // Routes
 const formController = require('./controllers/formController')
-app.use('/api', formController)
+app.use('/api/comments', formController)
 
 const userController = require('./controllers/userController')
 app.use('/api/users', userController)

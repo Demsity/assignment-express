@@ -1,47 +1,56 @@
 const express = require('express')
+const { default: mongoose } = require('mongoose')
 const controller = express.Router()
-let comments = require('../data/simulated_database_comments')
+const commentSchema = require('../schemas/commentSchema')
 
-module.exports = controller
 
-controller.param("id", (req, res, next, id) => {
-    req.comments = comments.find(comments => comments.id == id)
-    next()
-})
+// Create Product
+controller.post('/', async (req, res) => {
+    const {name, email, comments} = req.body
+    console.log(req.body)
+    
 
-controller.post('/', (req, res) => {
-   console.log(req.body.name)
-   
-    let comment = {
-        id: (comments[comments.length -1])?.id > 0 ? (comments[comments.length -1])?.id +1 : 1,
-        name: req.body.name,
-        email: req.body.email,
-        comments: req.body.comments,
-        markedAsDone: false
+    if (!name || !email || !comments) {
+        res.status(400).json()
+    } 
+   try {
+        const comment = await commentSchema.create({
+            name, 
+            email, 
+            comment
+        })
+        if (comment) {
+            res.status(201).json()
+            console.log(comment)
+
+        }
+    } catch {
+    res.status(400).json()
+
     }
-
-    comments.push(comment)
-    console.log(comments)
-    res.status(201).json()
+    
 })
 
 // Get a single comment
-controller.get('/admin/:id', (req, res) => {
-
-    if (req != undefined){
-        res.status(200).json(req.comments)
-    }else {
+controller.get('/:id', async (req, res) => {
+    try {
+        const comment = commentSchema.findById(req.body._id)
+        res.status(200).json(comment)
+    } catch {
         res.status(404).json()
     }
 })
 
 
 // Get x Number or All
-controller.get(`/admin`, (req, res) => {
-    let take = req.query.take
-    if (req.query.take !== undefined){
-        res.status(200).json(comments.slice(0, take))
-    }else {
+controller.get(`/`, async (req, res) => {
+    try {
+        const comments = commentSchema.find()
         res.status(200).json(comments)
+        console.log(comments)
+    } catch {
+        res.status(404).json()
     }
 }) 
+
+module.exports = controller
