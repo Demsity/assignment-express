@@ -1,7 +1,8 @@
 const express = require('express')
 const bCrypt = require('bcrypt')
+const { default: mongoose } = require('mongoose')
 const controller = express.Router()
-let users = require('../data/simulated_database_users')
+const userSchema = require('../schemas/userSchema')
 
 module.exports = controller
 
@@ -9,17 +10,20 @@ controller.post('/register', async (req, res) => {
     try {
         const hashedPassword = await bCrypt.hash(req.body.password, 10)
 
-        if (users.find(user => user.email !== req.body.email)) {
-            const user = {
-                id: (users[users.length -1])?.id > 0 ? (users[users.length -1])?.id +1 : 1,
+        const userConflict = await userSchema.findOne({email: req.body.email})
+
+        if (userConflict) {
+            res.status(409).json()
+            console.log('conflict')
+
+        } else {
+            const user = userSchema.create({
                 name: req.body.name,
                 email: req.body.email,
                 password: hashedPassword
-            }
-            users.push(user)
+            })
+            console.log(user)
             res.status(201).json(user)
-        } else {
-            res.status(409)
         }
 
 
@@ -30,19 +34,23 @@ controller.post('/register', async (req, res) => {
 
 controller.post('/login', async (req, res) => {
     if (req !== undefined) {
-        const user = users.find(user => user.email === req.body.email)
+        const user = await userSchema.findOne({email: req.body.email})
+        console.log(user)
 
         if (user !== undefined) {
             try {
                 if (await bCrypt.compare(req.body.password, user.password)){
                     console.log('logged in')
-                    res.status(200).json()
+                    res.status(200).json({
+                        
+                    })
                 } else {
                     console.log('wrong password')
                     res.status(400).json()
                 }
             } catch {
                 res.status(500)
+                console.log('error')
             }
 
         } else {
@@ -54,10 +62,28 @@ controller.post('/login', async (req, res) => {
     }
 })
 
-controller.get('/', (req, res) => {
-    if (req !== undefined) {
-        res.status(200).json(users)
-    } else {
+controller.get('/', async (req, res) => {
+    try {
+        const changedUsers = []
+        const users = await userSchema.find()
+        // Make password blank to not send it to Front End
+        for (let user of users) {
+            user.password = ''
+            changedUsers.push(user)
+        }
+        res.status(200).json(changedUsers)
+    } catch {
         res.status(404).json()
     }
+})
+
+//Delete a user
+controller.delete('/:id', async (req, res) => {
+    try {
+        await userSchema.findByIdAndDelete(req.params.id)
+        res.status(200)
+    }catch {
+        res.status(404)
+    }
+
 })

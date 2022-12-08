@@ -12,16 +12,16 @@ controller.post('/', async (req, res) => {
 
     if (!name || !email || !comments) {
         res.status(400).json()
+        
     } 
    try {
         const comment = await commentSchema.create({
-            name, 
-            email, 
-            comment
+            name: name,
+            email: email, 
+            comment: comments
         })
         if (comment) {
             res.status(201).json()
-            console.log(comment)
 
         }
     } catch {
@@ -45,12 +45,22 @@ controller.get('/:id', async (req, res) => {
 // Get x Number or All
 controller.get(`/`, async (req, res) => {
     try {
-        const comments = commentSchema.find()
+        const comments = await commentSchema.find()
         res.status(200).json(comments)
-        console.log(comments)
     } catch {
         res.status(404).json()
     }
 }) 
+
+//Delete a comment
+controller.delete('/:id', async (req, res) => {
+    try {
+        await commentSchema.findByIdAndDelete(req.params.id)
+        res.status(200)
+    }catch {
+        res.status(404)
+    }
+
+})
 
 module.exports = controller
