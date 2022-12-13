@@ -2,6 +2,7 @@ const express = require('express')
 const { default: mongoose } = require('mongoose')
 const controller = express.Router()
 const productSchema = require('../schemas/productSchema')
+const { authorize } = require('../middleware/auth')
 
 //middleware
 
@@ -26,7 +27,7 @@ controller.get('/:id', async (req, res) => {
                 res.status(200).json(product) 
 
         } else {
-            res.status(404)
+            res.status(404).json()
         }
 
 })
@@ -56,7 +57,7 @@ controller.get(`/`, async (req, res) => {
                 res.status(200).json(products)
             }
         } else {
-            res.status(404)
+            res.status(404).json()
         }
 
     } catch {
@@ -91,7 +92,7 @@ controller.get(`/get/:tag`, async (req, res) => {
                 res.status(200).json(products)
             }
         } else {
-            res.status(404)
+            res.status(404).json()
         }
     } catch {
         res.status(400).json()
@@ -124,7 +125,7 @@ controller.get(`/price/:price`, async (req, res) => {
                 res.status(200).json(products)
             }
         } else {
-            res.status(404)
+            res.status(404).json()
         }
     } catch {
         res.status(400).json()
@@ -137,7 +138,7 @@ controller.get(`/price/:price`, async (req, res) => {
 // secured routes //////////////////////////////////////////////////////////////////
 
 // Create Product
-controller.post('/', async (req, res) => {
+controller.post('/', authorize, async (req, res) => {
         const {name, price, description, rating, tag, imageName, category} = req.body
         
 
@@ -167,13 +168,12 @@ controller.post('/', async (req, res) => {
 })
 
 // update a product
-controller.put('/:id', async (req, res) => {
+controller.put('/:id', authorize, async (req, res) => {
 
     const {name, price, description, rating, tag, imageName, category} = req.body
     
         try {
             const filter = req.body.articleNumber
-            console.log(filter)
             await productSchema.findByIdAndUpdate({_id: filter}, {
                 name: name,
                 description: description, 
@@ -183,21 +183,22 @@ controller.put('/:id', async (req, res) => {
                 imageName: imageName,
                 rating: rating
             },{new: true})
-            res.status(200)
+            res.status(200).json()
         } catch {
-            res.status(400)
+            res.status(400).json()
         }
 
 
 })
 
 //Delete a product
-controller.delete('/:id', async (req, res) => {
+controller.delete('/:id', authorize, async (req, res) => {
+    console.log(req.body)
     try {
-        await productSchema.findByIdAndDelete(req.params.id)
-        res.status(200)
+        await productSchema.findByIdAndDelete(req.body.articleNumber)
+        res.status(200).json()
     }catch {
-        res.status(404)
+        res.status(404).json()
     }
 
 })

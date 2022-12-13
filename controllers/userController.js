@@ -3,6 +3,7 @@ const bCrypt = require('bcrypt')
 const { default: mongoose } = require('mongoose')
 const controller = express.Router()
 const userSchema = require('../schemas/userSchema')
+const { generateAccesTolken, authorize } = require('../middleware/auth')
 
 module.exports = controller
 
@@ -35,14 +36,13 @@ controller.post('/register', async (req, res) => {
 controller.post('/login', async (req, res) => {
     if (req !== undefined) {
         const user = await userSchema.findOne({email: req.body.email})
-        console.log(user)
 
         if (user !== undefined) {
             try {
                 if (await bCrypt.compare(req.body.password, user.password)){
                     console.log('logged in')
                     res.status(200).json({
-                        
+                        accesToken: generateAccesTolken(user._id)
                     })
                 } else {
                     console.log('wrong password')
@@ -78,7 +78,7 @@ controller.get('/', async (req, res) => {
 })
 
 //Delete a user
-controller.delete('/:id', async (req, res) => {
+controller.delete('/:id', authorize, async (req, res) => {
     try {
         await userSchema.findByIdAndDelete(req.params.id)
         res.status(200)

@@ -2,6 +2,7 @@ const express = require('express')
 const { default: mongoose } = require('mongoose')
 const controller = express.Router()
 const commentSchema = require('../schemas/commentSchema')
+const { authorize } = require('../middleware/auth')
 
 
 // Create Product
@@ -53,7 +54,7 @@ controller.get(`/`, async (req, res) => {
 }) 
 
 //Delete a comment
-controller.delete('/:id', async (req, res) => {
+controller.delete('/:id', authorize, async (req, res) => {
     try {
         await commentSchema.findByIdAndDelete(req.params.id)
         res.status(200)
