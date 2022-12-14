@@ -1,6 +1,8 @@
 const { GraphQLString, GraphQLObjectType, GraphQLList } = require('graphql')
 const productSchema = require('../schemas/productSchema')
-const { productType } = require('./graphQLTypes')
+const userSchema = require('../schemas/userSchema')
+const commentSchema = require('../schemas/commentSchema')
+const { productType, commentType, userType } = require('./graphQLTypes')
  
 // Query
 const RootQuery = new GraphQLObjectType({
@@ -36,6 +38,18 @@ const RootQuery = new GraphQLObjectType({
                 return product =  productSchema.find({price: args.price})
             }
         },
+        comments: {
+            type: new GraphQLList(commentType),
+            resolve: (parent, args) => {
+                return commentSchema.find()
+            }
+        }, 
+        users: {
+            type: new GraphQLList(userType),
+            resolve: (parent, args) => {
+                return userSchema.find()
+            }
+        }
     }
 })
 
@@ -99,6 +113,15 @@ const RootMutation = new GraphQLObjectType({
             },
             resolve(parent, args){
                 return productSchema.findByIdAndDelete(args.articleNumber)
+            }
+        },
+        removeComment: {
+            type: commentType,
+            args: {
+                _id: {type: GraphQLString},
+            },
+            resolve(parent, args){
+                return commentSchema.findByIdAndDelete(args._id)
             }
         },
     }

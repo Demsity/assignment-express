@@ -17,4 +17,24 @@ const productType = new GraphQLObjectType({
     })
 })
 
-module.exports = { productType }
+const commentType = new GraphQLObjectType({
+    name: 'Comment',
+    fields: () => ({
+        _id: {type: GraphQLID},
+        name: {type: GraphQLString},
+        email: {type: GraphQLString},
+        comment: {type: GraphQLString}
+    })
+})
+
+const userType = new GraphQLObjectType({
+    name: 'user',
+    fields: () => ({
+        _id: {type: GraphQLID},
+        name: {type: GraphQLString}, 
+        email: {type: GraphQLString}, 
+        password: {type: GraphQLString}, 
+    })
+})
+
+module.exports = { productType, commentType, userType }
