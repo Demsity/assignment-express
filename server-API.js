@@ -6,6 +6,9 @@ const mongodb = require('./server-MongoDB')
 const cors = require('cors')
 const bodeParser = require('body-parser')
 const app = express()
+const { graphqlHTTP } = require('express-graphql');
+const { root, queryType } = require('./graphQL/graphQL')
+const { GraphQLSchema } = require('graphql')
 
 
 //  Middleware
@@ -20,7 +23,18 @@ const userController = require('./controllers/userController')
 app.use('/api/users', userController)
 
 const productController = require('./controllers/productController')
+
 app.use('/api/products', productController)
+
+
+const schema = new GraphQLSchema({query: queryType})
+
+// GraphQL Route
+app.use('/graphql', graphqlHTTP({
+    schema: schema,
+    rootValue: root,
+    graphiql: true,
+  }));
 
 
 
