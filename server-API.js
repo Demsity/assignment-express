@@ -7,7 +7,7 @@ const cors = require('cors')
 const bodeParser = require('body-parser')
 const app = express()
 const { graphqlHTTP } = require('express-graphql');
-const { root, queryType } = require('./graphQL/graphQL')
+const { RootQuery, RootMutation } = require('./graphQL/graphQLRootQuery')
 const { GraphQLSchema } = require('graphql')
 
 
@@ -15,7 +15,7 @@ const { GraphQLSchema } = require('graphql')
 app.use(cors())
 app.use(bodeParser.json())
 
-// Routes
+// Routes REST
 const formController = require('./controllers/formController')
 app.use('/api/comments', formController)
 
@@ -27,12 +27,11 @@ const productController = require('./controllers/productController')
 app.use('/api/products', productController)
 
 
-const schema = new GraphQLSchema({query: queryType})
+const schema = new GraphQLSchema({query: RootQuery, mutation: RootMutation})
 
 // GraphQL Route
 app.use('/graphql', graphqlHTTP({
     schema: schema,
-    rootValue: root,
     graphiql: true,
   }));
 
