@@ -19,9 +19,9 @@ const RootQuery = new GraphQLObjectType({
         // get single product
         product: {
             type: productType,
-            args: {articleNumber: {type: GraphQLString}},
+            args: {_id: {type: GraphQLString}},
             resolve: (parent, args) => {
-                return product =  productSchema.findById(args.articleNumber)
+                return product =  productSchema.findById(args._id)
             }
         },
         productsTag: {
@@ -76,9 +76,11 @@ const RootMutation = new GraphQLObjectType({
                     description: args.description,
                     tag: args.tag,
                     price: args.price,
+                    rating: args.rating,
                     imageName: args.imageName
                 }
         
+                console.log('product created')
                 return result = productSchema.create(product)
             }
         },
@@ -122,6 +124,32 @@ const RootMutation = new GraphQLObjectType({
             },
             resolve(parent, args){
                 return commentSchema.findByIdAndDelete(args._id)
+            }
+        },
+        removeUser: {
+            type: userType,
+            args: {
+                _id: {type: GraphQLString},
+            },
+            resolve(parent, args){
+                return userSchema.findByIdAndDelete(args._id)
+            }
+        },
+        addComment: {
+            type: commentType,
+            args: {
+                name: {type: GraphQLString},
+                email: {type: GraphQLString},
+                comment: {type: GraphQLString},
+            },
+            resolve(parent, args){
+                let comment = {
+                    name: args.name,
+                    email: args.email,
+                    comment: args.comment,
+                }
+                console.log('comment posted')
+                return result = commentSchema.create(comment)
             }
         },
     }
