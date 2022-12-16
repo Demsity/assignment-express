@@ -87,7 +87,7 @@ const RootMutation = new GraphQLObjectType({
         updateProduct: {
             type: productType,
             args: {
-                articleNumber: {type: GraphQLString},
+                _id: {type: GraphQLString},
                 name: {type: GraphQLString},
                 category: {type: GraphQLString},
                 description: {type: GraphQLString},
@@ -97,7 +97,8 @@ const RootMutation = new GraphQLObjectType({
                 imageName: {type: GraphQLString},
             },
             resolve(parent, args){
-                return productSchema.findByIdAndUpdate({_id: args.articleNumber}, {
+                console.log('Product Updated')
+                return productSchema.findByIdAndUpdate({_id: args._id}, {
                     name: args.name,
                     description: args.description, 
                     price: args.price,
@@ -111,10 +112,11 @@ const RootMutation = new GraphQLObjectType({
         removeProduct: {
             type: productType,
             args: {
-                articleNumber: {type: GraphQLString},
+                _id: {type: GraphQLString},
             },
             resolve(parent, args){
-                return productSchema.findByIdAndDelete(args.articleNumber)
+                console.log('product removed')
+                return productSchema.findByIdAndDelete(args._id)
             }
         },
         removeComment: {
