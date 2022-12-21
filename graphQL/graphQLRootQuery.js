@@ -24,6 +24,7 @@ const RootQuery = new GraphQLObjectType({
                 return product =  productSchema.findById(args._id)
             }
         },
+        // Get products by tag
         productsTag: {
             type: new GraphQLList(productType),
             args: {tag: {type: GraphQLString}},
@@ -31,6 +32,7 @@ const RootQuery = new GraphQLObjectType({
                 return product =  productSchema.find({tag: args.tag})
             }
         },
+        // Get products by Price
         productsPrice: {
             type: new GraphQLList(productType),
             args: {price: {type: GraphQLString}},
@@ -38,12 +40,14 @@ const RootQuery = new GraphQLObjectType({
                 return product =  productSchema.find({price: args.price})
             }
         },
+        // Get all comments
         comments: {
             type: new GraphQLList(commentType),
             resolve: (parent, args) => {
                 return commentSchema.find()
             }
         }, 
+        // Get all Users
         users: {
             type: new GraphQLList(userType),
             resolve: (parent, args) => {
@@ -55,6 +59,7 @@ const RootQuery = new GraphQLObjectType({
 
 
 // Mutations
+// Add product mutation
 const RootMutation = new GraphQLObjectType({
     name: 'RootMutation', 
     fields: {
@@ -84,6 +89,7 @@ const RootMutation = new GraphQLObjectType({
                 return result = productSchema.create(product)
             }
         },
+        // Update product mutation
         updateProduct: {
             type: productType,
             args: {
@@ -109,6 +115,7 @@ const RootMutation = new GraphQLObjectType({
                 },{new: true})
             }
         },
+        // Remove Product Mutation
         removeProduct: {
             type: productType,
             args: {
@@ -119,6 +126,7 @@ const RootMutation = new GraphQLObjectType({
                 return productSchema.findByIdAndDelete(args._id)
             }
         },
+        // Remove Comments
         removeComment: {
             type: commentType,
             args: {
@@ -128,6 +136,7 @@ const RootMutation = new GraphQLObjectType({
                 return commentSchema.findByIdAndDelete(args._id)
             }
         },
+        // Remove user, uses REST
         removeUser: {
             type: userType,
             args: {
@@ -137,6 +146,7 @@ const RootMutation = new GraphQLObjectType({
                 return userSchema.findByIdAndDelete(args._id)
             }
         },
+        // Add Comment
         addComment: {
             type: commentType,
             args: {

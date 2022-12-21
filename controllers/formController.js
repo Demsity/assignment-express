@@ -5,6 +5,8 @@ const commentSchema = require('../schemas/commentSchema')
 const { authorize } = require('../middleware/auth')
 
 
+// Not used anymore, leaving them in for review
+
 // Create Product
 controller.post('/', async (req, res) => {
     const {name, email, comments} = req.body

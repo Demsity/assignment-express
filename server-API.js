@@ -16,20 +16,20 @@ app.use(cors())
 app.use(bodeParser.json())
 
 // Routes REST
-const formController = require('./controllers/formController')
-app.use('/api/comments', formController)
+// No longer in use, leaving them in for review
+// const formController = require('./controllers/formController')
+// app.use('/api/comments', formController)
 
-const userController = require('./controllers/userController')
-app.use('/api/users', userController)
+// const userController = require('./controllers/userController')
+// app.use('/api/users', userController)
 
 const productController = require('./controllers/productController')
 
 app.use('/api/products', productController)
 
-
+// GraphQL Route
 const schema = new GraphQLSchema({query: RootQuery, mutation: RootMutation})
 
-// GraphQL Route
 app.use('/graphql', graphqlHTTP({
     schema: schema,
     graphiql: true,

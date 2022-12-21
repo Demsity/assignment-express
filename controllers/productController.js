@@ -6,6 +6,9 @@ const { authorize } = require('../middleware/auth')
 
 //middleware
 
+// Not used anymore, leaving them in for review
+
+
 
 // unsecured routes ///////////////////////////////////////////////////////
 
