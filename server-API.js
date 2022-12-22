@@ -20,12 +20,11 @@ app.use(bodeParser.json())
 // const formController = require('./controllers/formController')
 // app.use('/api/comments', formController)
 
-// const userController = require('./controllers/userController')
-// app.use('/api/users', userController)
+// const productController = require('./controllers/productController')
+// app.use('/api/products', productController)
 
-const productController = require('./controllers/productController')
-
-app.use('/api/products', productController)
+const userController = require('./controllers/userController')
+app.use('/api/users', userController)
 
 // GraphQL Route
 const schema = new GraphQLSchema({query: RootQuery, mutation: RootMutation})

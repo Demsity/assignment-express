@@ -18,7 +18,7 @@ controller.post('/register', async (req, res) => {
             console.log('conflict')
 
         } else {
-            const user = userSchema.create({
+            const user = await userSchema.create({
                 name: req.body.name,
                 email: req.body.email,
                 password: hashedPassword
